@@ -50,6 +50,13 @@ class Navis_Related_Content {
             array( &$this, 'add_stylesheet' ) 
         );
         
+        add_action( 'admin_print_scripts-post.php', 
+            array( &$this, 'register_admin_scripts' )
+        );
+        add_action( 'admin_print_scripts-post-new.php', 
+            array( &$this, 'register_admin_scripts' )
+        );
+        
         add_shortcode('spreadsheet', array(&$this, 'shortcode'));
         
     }
@@ -120,12 +127,19 @@ class Navis_Related_Content {
     		else
     			$info = $pts[ $post->post_type ]->labels->singular_name;
 
-    		$results[] = array(
+    		$data = array(
     			'ID' => $post->ID,
     			'title' => trim( esc_html( strip_tags( get_the_title( $post ) ) ) ),
     			'permalink' => get_permalink( $post->ID ),
     			'info' => $info,
     		);
+    		
+    		if (has_post_thumbnail($post->ID)) {
+    		    $data['thumbnail'] = wp_get_attachment_image_src(
+    		        get_the_post_thumbnail_id($post->ID), 'thumbnail');
+    		}
+    		
+    		$results[] = $data;
     	}
 
     	return $results;
@@ -196,7 +210,19 @@ class Navis_Related_Content {
         );
     }
     
-    function admin_js() {
+    function register_admin_scripts() {
+        $jslibs = array(
+            'underscore' => plugins_url('js/underscore-min.js', __FILE__),
+            'backbone' => plugins_url('js/backbone-min.js', __FILE__),
+            'related-content' => plugins_url('js/related-content.js', __FILE__),
+        );
+        
+        wp_enqueue_script( 'underscore', $jslibs['underscore']);
+        wp_enqueue_script( 'backbone', $jslibs['backbone'],
+            array('underscore', 'jquery'));
+        wp_enqueue_script( 'related-content', $jslibs['related-content'],
+            array('jquery', 'underscore', 'backbone'),
+            "0.1");
         
     }
 }
