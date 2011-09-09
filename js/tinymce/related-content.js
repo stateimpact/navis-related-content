@@ -22,9 +22,10 @@
                                 title: "Related Content",
                                 modal: true,
                                 dialogClass: 'wp-dialog',
+                                width: 550,
                                 buttons: {
-                                    'Cancel': function() {
-                                        $(this).dialog('close');
+                                    "Save": function() {
+                                        window.related_content_builder.save();
                                     }
                                 }
                             });

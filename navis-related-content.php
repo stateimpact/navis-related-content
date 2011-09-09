@@ -153,8 +153,8 @@ class Navis_Related_Content {
     function ajax_render_form() { ?>
         <form id="navis-related-content-form" tabindex="-1">
         <?php wp_nonce_field( 'navis-related-content-form', '_navis_related_content_nonce', true ); ?>
-        <div id="link-selector">
-        	<div id="link-options">
+        <div id="related-link-selector">
+        	<div id="related-link-options">
         		<p class="howto"><?php _e( 'Enter the destination URL' ); ?></p>
         		<div>
         			<label><span><?php _e( 'URL' ); ?></span><input id="url-field" type="text" tabindex="10" name="href" /></label>
@@ -162,13 +162,16 @@ class Navis_Related_Content {
         		<div>
         			<label><span><?php _e( 'Title' ); ?></span><input id="link-title-field" type="text" tabindex="20" name="linktitle" /></label>
         		</div>
+        		<div>
+        		    <input type="button" value="Add" class="button add"/>
+        		</div>
         	</div>
         	<p class="howto">Link to recent content</p>
-        	<div id="search-panel">
+        	<div id="related-search-panel">
         		<div class="link-search-wrapper">
         			<label>
         				<span><?php _e( 'Search' ); ?></span>
-        				<input type="text" id="search-field" class="link-search-field" tabindex="60" autocomplete="off" />
+        				<input type="text" id="related-search-field" class="link-search-field" tabindex="60" autocomplete="off" />
         			</label>
         		</div>
         		<div id="related-search-results" class="query-results">
@@ -178,8 +181,14 @@ class Navis_Related_Content {
         		</div>
         	</div>
         </div>
-        <div id="chosen-links"></div>
-        <div id="chosen-topics"></div>
+        <div id="chosen">
+            <div id="chosen-links">
+                <h4>Links</h4>
+            </div>
+            <div id="chosen-topics">
+                <h4>Topics</h4>
+            </div>
+        </div>
         </form>
         <?php
         die();

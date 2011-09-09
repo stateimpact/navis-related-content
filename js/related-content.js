@@ -69,28 +69,22 @@
     window.LinkList = Backbone.Collection.extend({
         model: Link,
         
-        url: window.ajaxurl
+        url: window.ajaxurl,
         
-        /***
-        fetch: function(options) {
-            _.defaults(options, {
-                action: "fetch_related_content"
-            });
-            var model = this;
-            var success = options.success;
-            options.success = function(resp, status, xhr) {
-                if (!model.set(model.parse(resp, xhr), options)) return false;
-                if (success) success(model, resp);
-            };
-            options.error = wrapError(options.error, model, options);
-            return (this.sync || Backbone.sync).call(this, 'read', this, options);
-        },
-        ***/
+        initialize: function(models, options) {
+            // a helper for later
+            this.name = options.name;
+            return this;
+        }
     });
     
     var LinkView = Backbone.View.extend({
         
         className: 'link',
+        
+        events: {
+            'click a' : 'chooseLink'
+        },
         
         initialize: function(options) {
             _.bindAll(this);
@@ -108,7 +102,32 @@
                 .attr('href', this.model.get('permalink'))
                 .text(this.model.get('type').toUpperCase() + ": " + this.model.get('title'))
                 .appendTo( $(this.el) );
+            
+            if (this.collection && this.collection.name !== 'search') {
+                var del = $('<a class="button">X</a>')
+                    .appendTo( $(this.el) );
+            }
+            
             return this;
+        },
+        
+        chooseLink: function(e) {
+            e.preventDefault();
+            var link = this.model;
+            if (link.collection.name === "search") {
+                // it's in the search box, not chosen yet
+                link.collection.remove(link);
+                
+                if (link.get('type') === "topic") {
+                    window.related_content_builder.topics.collection.add(link);
+                } else {
+                    window.related_content_builder.links.collection.add(link);
+                }
+            } else {
+                // it's already been chosen, so we're un-choosing
+                link.collection.remove(link);
+                window.related_content_builder.search.collection.add(link);
+            }
         }
     });
     
@@ -118,6 +137,7 @@
         initialize: function(options) {
             _.bindAll(this);
             this.collection.bind('reset', this.render);
+            this.collection.bind('add', this.addLink);
             return this;
         },
         
@@ -127,6 +147,10 @@
             this.collection.each(function(link, i, links) {
                 $(el).append(link.view.el);
             });
+        },
+        
+        addLink: function(link) {
+            $(this.el).append(link.view.el);
         }
     });
     
@@ -137,28 +161,50 @@
         
         el: '#navis-related-content-form',
         
+        events: {
+            'click input.add' : 'addLink'
+        },
+        
         initialize: function(options) {
             _.extend(this, options);
             _.bindAll(this);
             
             this.search = new LinkListView({
                 el: '#related-search-results',
-                collection: new LinkList()
+                collection: new LinkList([], {name: 'search'})
             });
             this.search.collection.fetch();
             
             this.links = new LinkListView({
                 el: "#chosen-links",
-                collection: new LinkList()
+                collection: new LinkList([], {name: 'links'})
             });
             
             this.topics = new LinkListView({
                 el: "#chosen-topics",
-                collection: new LinkList()
+                collection: new LinkList([], {name: 'topics'})
             });
             
             return this;
         },
+        
+        addLink: function(e) {
+            var title = this.$('#link-title-field'),
+                url = this.$('#url-field');
+                
+            var link = new Link({
+                title: title.val(),
+                permalink: url.val(),
+                type: "link"
+            });
+            window.related_content_builder.links.collection.add(link);
+            title.val('');
+            url.val('');
+        },
+        
+        save: function() {
+            
+        }
         
     });
         

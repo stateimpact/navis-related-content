@@ -1,14 +1,34 @@
-
 #navis-related-content-form {
     background-color: white;
     padding: .5em;
 }
 
-#related-content-wrap {
-    background-color: white;
+#related-search-results {
+    height: 200px;
+    overflow: auto;
 }
 
-div.ui-dialog-titlebar {
-    background-color: #333;
-    color: #dedede;
+#related-link-selector {
+    width: 55%;
+    float: left;
+}
+
+div.link {
+    padding: .5em;
+    border: 1px solid #ddd;
+    margin-right: .25em;
+    margin-left: .25em;
+}
+
+#chosen {
+    width: 40%;
+    float: left;
+}
+
+#chosen div {
+    float: left;
+    clear: both;
+    width: 100%;
+    margin-right: .25em;
+    margin-left: .25em;
 }
