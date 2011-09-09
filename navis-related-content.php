@@ -57,7 +57,7 @@ class Navis_Related_Content {
             array( &$this, 'register_admin_scripts' )
         );
         
-        add_shortcode('spreadsheet', array(&$this, 'shortcode'));
+        add_shortcode('related_content', array(&$this, 'shortcode'));
         
     }
     
@@ -164,24 +164,17 @@ class Navis_Related_Content {
         			<label>
         				<span><?php _e( 'Search' ); ?></span>
         				<input type="text" id="search-field" class="link-search-field" tabindex="60" autocomplete="off" />
-        				<img class="waiting" src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" alt="" />
         			</label>
         		</div>
         		<div id="search-results" class="query-results">
-        			<ul></ul>
-        			<div class="river-waiting">
-        				<img class="waiting" src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" alt="" />
-        			</div>
-        		</div>
-        		<div id="most-recent-results" class="query-results">
-        			<div class="query-notice"><em><?php _e( 'No search term specified. Showing recent items.' ); ?></em></div>
-        			<ul></ul>
         			<div class="river-waiting">
         				<img class="waiting" src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" alt="" />
         			</div>
         		</div>
         	</div>
         </div>
+        <div id="chosen-links"></div>
+        <div id="chosen-topics"></div>
         </form>
         <?php
         die();
