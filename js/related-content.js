@@ -12,22 +12,27 @@
 
     Backbone.sync = function(method, model, options) {
         
-        if (options.action) {
-            var action = options.action;
-            delete options.action;
-        } else {
-            // wordpress needs an action, or it's no op
-            return;
+        var actions = {
+            'create': 'save_related_content',
+            'update': 'save_related_content',
+            'read'  : 'fetch_related_content'
+        };
+        
+        var data = options.data || {};
+        data.action = actions[method];
+        if (!data.action) return;
+        
+        var success = function(data) {
+            data = JSON.parse(data);
+            if (_.isFunction(options.success)) {
+                options.success(data);
+            }
         }
-        
-        var data = options.data;
-        data.action = action;
-        
         $.ajax({
             url: window.ajaxurl,
             type: 'POST',
             data: data,
-            success: options.success,
+            success: success,
             error: options.error
         });
     }
@@ -35,12 +40,19 @@
     // one link, to a post, topic, or somewhere else
     var Link = Backbone.Model.extend({
         
+        initialize: function(attributes, options) {
+            this.view = new LinkView({ model: this });
+            return this;
+        },
+        
         defaults: {
             title: "",
-            url: "",
+            permalink: "",
             type: "post",
             thumbnail: ""
-        }
+        },
+        
+        url: window.ajaxurl
     });
     
     // container model for a group of links
@@ -78,25 +90,23 @@
     
     var LinkView = Backbone.View.extend({
         
-        tagName: 'link',
+        className: 'link',
         
         initialize: function(options) {
             _.bindAll(this);
-            this.model.view = this;
-            
             return this.render();
         },
         
         render: function() {
-            if (this.model.thumbnail && this.model.get('type') === "topic") {
+            if (this.model.get('thumbnail') && this.model.get('type') === "topic") {
                 var img = $('<img/>')
-                    .attr('src', this.model.thumbnail)
+                    .attr('src', this.model.get('thumbnail'))
                     .appendTo( $(this.el) );
-            }
+            };
             
             var a = $('<a/>')
-                .attr('href', this.model.url)
-                .text(this.model.title)
+                .attr('href', this.model.get('permalink'))
+                .text(this.model.get('type').toUpperCase() + ": " + this.model.get('title'))
                 .appendTo( $(this.el) );
             return this;
         }
@@ -130,6 +140,23 @@
         initialize: function(options) {
             _.extend(this, options);
             _.bindAll(this);
+            
+            this.search = new LinkListView({
+                el: '#related-search-results',
+                collection: new LinkList()
+            });
+            this.search.collection.fetch();
+            
+            this.links = new LinkListView({
+                el: "#chosen-links",
+                collection: new LinkList()
+            });
+            
+            this.topics = new LinkListView({
+                el: "#chosen-topics",
+                collection: new LinkList()
+            });
+            
             return this;
         },
         
