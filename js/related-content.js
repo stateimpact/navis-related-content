@@ -19,20 +19,20 @@
         };
         
         var data = options.data || {};
-        data.action = actions[method];
+        if (options.action) {
+            data.action = options.action;
+            delete options.action;
+        } else {
+            data.action = actions[method];
+        }
+        
         if (!data.action) return;
         
-        var success = function(data) {
-            data = JSON.parse(data);
-            if (_.isFunction(options.success)) {
-                options.success(data);
-            }
-        }
         $.ajax({
             url: window.ajaxurl,
             type: 'POST',
             data: data,
-            success: success,
+            success: options.success,
             error: options.error
         });
     }
@@ -60,7 +60,13 @@
         
         defaults: {
             title: "",
-            links: []
+            links: [],
+            topics: []
+        },
+        
+        initialize: function(attributes, options) {
+            this.set({ post_parent: $('#post_ID').val()});
+            this.fetch();
         }
     });
     
@@ -169,6 +175,8 @@
             _.extend(this, options);
             _.bindAll(this);
             
+            this.model = new RelatedContentModule;
+            
             this.search = new LinkListView({
                 el: '#related-search-results',
                 collection: new LinkList([], {name: 'search'})
@@ -203,7 +211,11 @@
         },
         
         save: function() {
-            
+            this.model.set({
+                links: this.links.collection.toJSON(),
+                topics: this.topics.collection.toJSON()
+            });
+            this.model.save();
         }
         
     });

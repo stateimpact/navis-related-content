@@ -36,6 +36,8 @@ class Navis_Related_Content {
         
         add_action('wp_ajax_related_content_form',
             array(&$this, 'ajax_render_form'));
+        add_action('wp_ajax_get_create_related_module',
+            array(&$this, 'ajax_get_create_module'));
         add_action('wp_ajax_fetch_related_content',
             array(&$this, 'ajax_fetch'));
         add_action('wp_ajax_save_related_content',
@@ -79,7 +81,7 @@ class Navis_Related_Content {
     
     function add_tinymce_plugin($plugin_array) {
         $plugin_array['related_content'] = plugins_url(
-            'js/tinymce/related-content.js', __FILE__);
+            'js/tinymce/related-content-tinymce.js', __FILE__);
         return $plugin_array;
     }
     
@@ -128,7 +130,7 @@ class Navis_Related_Content {
     			$info = $pts[ $post->post_type ]->labels->singular_name;
 
     		$data = array(
-    			'ID' => $post->ID,
+    			'id' => $post->ID,
     			'title' => trim( esc_html( strip_tags( get_the_title( $post ) ) ) ),
     			'permalink' => get_permalink( $post->ID ),
     			'info' => $info,
@@ -150,7 +152,8 @@ class Navis_Related_Content {
     	return $results;
     }
     
-    function ajax_render_form() { ?>
+    function ajax_render_form() { 
+        ?>
         <form id="navis-related-content-form" tabindex="-1">
         <?php wp_nonce_field( 'navis-related-content-form', '_navis_related_content_nonce', true ); ?>
         <div id="related-link-selector">
@@ -196,11 +199,17 @@ class Navis_Related_Content {
     
     function ajax_fetch() {
         $posts = $this->query($_POST);
+        header( "Content-Type: application/json" );
         echo json_encode($posts);
         die();
     }
     
     function ajax_save( $args = array() ) {
+        
+        die();
+    }
+    
+    function ajax_get_create_module( $args = array() ) {
         
         die();
     }
