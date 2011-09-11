@@ -19,13 +19,10 @@
         };
         
         var data = options.data || {};
-        if (options.action) {
-            data.action = options.action;
-            delete options.action;
-        } else {
+        if (!data.action) {
             data.action = actions[method];
         }
-        
+        console.log(data);
         if (!data.action) return;
         
         $.ajax({
@@ -66,7 +63,12 @@
         
         initialize: function(attributes, options) {
             this.set({ post_parent: $('#post_ID').val()});
-            this.fetch({ action: 'get_create_related_module'});
+            this.fetch({
+                data: {
+                    action: 'get_create_related_module',
+                    post_parent: this.get('post_parent')
+                }
+            });
             return this;
         }
     });

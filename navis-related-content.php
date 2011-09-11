@@ -104,7 +104,7 @@ class Navis_Related_Content {
     		'post_status' => 'publish',
     		'order' => 'DESC',
     		'orderby' => 'post_date',
-    		'posts_per_page' => 20,
+    		'posts_per_page' => 50,
     	);
 
     	$args['pagenum'] = isset( $args['pagenum'] ) ? absint( $args['pagenum'] ) : 1;
@@ -209,8 +209,43 @@ class Navis_Related_Content {
         die();
     }
     
-    function ajax_get_create_module( $args = array() ) {
-        
+    function ajax_get_create_module() {
+        error_log("POST get_create_related_module");
+        if ($_POST['post_parent']) {
+            // for now, we need to know what post this is attached to
+            $args = array(
+                'post_parent' => $_POST['post_parent'],
+                'post_type' => 'related_content_module',
+                'numberposts' => 1
+            );
+            $post = get_posts($args);
+            if ($post) {
+                // get topics and links from postmeta
+                $data = array(
+                    'title' => $post->post_title,
+                    'links' => get_post_meta($post->ID, 'related_links', true),
+                    'topics' => get_post_meta($post->ID, 'related_topics', true)
+                );
+                header( "Content-Type: application/json" );
+                echo json_encode($data);
+            } else {
+                // create a new post
+                $post_id = wp_insert_post(array(
+                    'post_type' => 'related_content_module',
+                    'post_parent' => $_POST['post_parent'],
+                    'title' => 'Related: ' . $_POST['post_parent'],
+                    'post_status' => 'publish'
+                ));
+                error_log($post_id);
+                $data = array(
+                    'title' => get_the_title($post_id),
+                    'links' => get_post_meta($post_id, 'related_links', true),
+                    'topics' => get_post_meta($post_id, 'related_topics', true)
+                );
+                header( "Content-Type: application/json" );
+                echo json_encode($data);
+            }
+        }
         die();
     }
     

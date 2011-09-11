@@ -18,6 +18,12 @@ div.link {
     border: 1px solid #ddd;
     margin-right: .25em;
     margin-left: .25em;
+    clear: both;
+}
+
+div.link img {
+    float: left;
+    margin-right: .25em;
 }
 
 #chosen {
