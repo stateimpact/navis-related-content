@@ -66,7 +66,8 @@
         
         initialize: function(attributes, options) {
             this.set({ post_parent: $('#post_ID').val()});
-            this.fetch();
+            this.fetch({ action: 'get_create_related_module'});
+            return this;
         }
     });
     
@@ -174,9 +175,7 @@
         initialize: function(options) {
             _.extend(this, options);
             _.bindAll(this);
-            
-            this.model = new RelatedContentModule;
-            
+                        
             this.search = new LinkListView({
                 el: '#related-search-results',
                 collection: new LinkList([], {name: 'search'})
@@ -191,6 +190,13 @@
             this.topics = new LinkListView({
                 el: "#chosen-topics",
                 collection: new LinkList([], {name: 'topics'})
+            });
+            
+            var that = this;
+            this.model = new RelatedContentModule;
+            this.model.bind('change', function(module) {
+                that.links.collection.reset(module.get('links'));
+                that.topics.collection.reset(module.get('topics'));
             });
             
             return this;
