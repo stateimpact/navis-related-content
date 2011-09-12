@@ -172,7 +172,8 @@
         el: '#navis-related-content-form',
         
         events: {
-            'click input.add' : 'addLink'
+            'click input.add' : 'addLink',
+            'keyup #related-search-field' : 'searchContent'
         },
         
         initialize: function(options) {
@@ -205,6 +206,20 @@
             return this;
         },
         
+        searchContent: function(e) {
+            var query = this.$('#related-search-field').val();
+            if (query.length > 3) {
+                this.search.collection.fetch({ 
+                    data: {
+                        s: query
+                    }
+                });
+            } else if (query.length == 0) {
+                this.search.collection.fetch();
+            }
+            return this;
+        },
+                
         addLink: function(e) {
             var title = this.$('#link-title-field'),
                 url = this.$('#url-field');
