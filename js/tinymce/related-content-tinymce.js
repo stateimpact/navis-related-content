@@ -30,7 +30,9 @@
                                 }
                             });
                         window.related_content_dialog_loaded = true;
-                        window.related_content_builder = new RelatedContentBuilder;
+                        window.related_content_builder = new RelatedContentBuilder({
+                            editor: ed
+                        });
                     });
                 }
                 

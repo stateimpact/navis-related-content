@@ -45,11 +45,11 @@ class Navis_Related_Content {
         
         add_action( 
             'admin_print_styles-post.php', 
-            array( &$this, 'add_stylesheet' ) 
+            array( &$this, 'add_admin_stylesheet' ) 
         );
         add_action( 
             'admin_print_styles-post-new.php', 
-            array( &$this, 'add_stylesheet' ) 
+            array( &$this, 'add_admin_tylesheet' ) 
         );
         
         add_action( 'admin_print_scripts-post.php', 
@@ -59,6 +59,7 @@ class Navis_Related_Content {
             array( &$this, 'register_admin_scripts' )
         );
         
+        add_action('wp_print_styles', array(&$this, 'add_stylesheet'));
         add_shortcode('related_content', array(&$this, 'shortcode'));
         
     }
@@ -185,11 +186,13 @@ class Navis_Related_Content {
         	</div>
         </div>
         <div id="chosen">
-            <div id="chosen-links">
+            <div id="links-wrap">
                 <h4>Links</h4>
+                <div id="chosen-links"></div>
             </div>
-            <div id="chosen-topics">
+            <div id="topics-wrap">
                 <h4>Topics</h4>
+                <div id="chosen-topics"></div>
             </div>
         </div>
         </form>
@@ -204,57 +207,86 @@ class Navis_Related_Content {
         die();
     }
     
-    function ajax_save( $args = array() ) {
-        
+    function ajax_save() {
+        if ($_POST['post_parent']) {
+            $post_id = $_POST['post_parent'];
+
+            update_post_meta($post_id, 'related_links', $_POST['links']);
+            update_post_meta($post_id, 'related_topics', $_POST['topics']);
+        } else {
+            error_log("No post_parent");
+        }
         die();
     }
     
     function ajax_get_create_module() {
-        error_log("POST get_create_related_module");
         if ($_POST['post_parent']) {
             // for now, we need to know what post this is attached to
-            $args = array(
-                'post_parent' => $_POST['post_parent'],
-                'post_type' => 'related_content_module',
-                'numberposts' => 1
+            $post_id = $_POST['post_parent'];
+            $links = get_post_meta($post_id, 'related_links', true);
+            $topics = get_post_meta($post_id, 'related_topics', true);
+            $data = array(
+                'links' => $links ? $links : array(),
+                'topics' => $topics ? $topics : array()
             );
-            $post = get_posts($args);
-            if ($post) {
-                // get topics and links from postmeta
-                $data = array(
-                    'title' => $post->post_title,
-                    'links' => get_post_meta($post->ID, 'related_links', true),
-                    'topics' => get_post_meta($post->ID, 'related_topics', true)
-                );
-                header( "Content-Type: application/json" );
-                echo json_encode($data);
-            } else {
-                // create a new post
-                $post_id = wp_insert_post(array(
-                    'post_type' => 'related_content_module',
-                    'post_parent' => $_POST['post_parent'],
-                    'title' => 'Related: ' . $_POST['post_parent'],
-                    'post_status' => 'publish'
-                ));
-                error_log($post_id);
-                $data = array(
-                    'title' => get_the_title($post_id),
-                    'links' => get_post_meta($post_id, 'related_links', true),
-                    'topics' => get_post_meta($post_id, 'related_topics', true)
-                );
-                header( "Content-Type: application/json" );
-                echo json_encode($data);
-            }
+            header( "Content-Type: application/json" );
+            echo json_encode($data);
+            
         }
         die();
     }
     
     function shortcode($atts, $content = null) {
+        global $post;
+        $links = get_post_meta($post->ID, 'related_links', true);
+        $topics = get_post_meta($post->ID, 'related_topics', true);
+        extract(shortcode_atts(array(
+            'align' => 'right'
+        ), $atts));
+        $classnames = array(
+            'left' => 'alignleft',
+            'right' => 'alignright'
+        );
+        if (in_array($align, $classnames)) {
+            $classname = $classnames[$align];
+        } else {
+            $classname = "alignright";
+        }
+        $html  = "<div id=\"related_content\" class=\"$classname\">";
+        $html .= '<div class="heading"><h4>Related</h4></div>';
         
-        return "";
+        // links
+        $html .= '<div class="links">';
+        $html .= '<ul class="links">';
+        foreach($links as $link) {
+            $html .= '<li class="link">';
+            $html .= "<a href=\"{$link['permalink']}\">{$link['title']}</a>";
+            $html .= '</li>';
+        }
+        $html .= '</ul></div><hr>';
+        
+        // topics
+        $html .= '<div class="topics">';
+        $html .= '<h5>Topics</h5>';
+        foreach($topics as $topic) {
+            $html .= '<p class="topic">';
+            if ($topic['thumbnail']) {
+                $html .= "<img class=\"alignleft\" src=\"{$topic['thumbnail']}\" height=\"60\" width=\"60\" />";
+            }
+            $html .= "<a href=\"{$topic['permalink']}\">{$topic['title']}</a>";
+            $html .= "</p>";
+        }
+        $html .= '</div>'; // close .topics
+        $html .= '</div>'; // and we're done
+        return $html;
     }
     
     function add_stylesheet() {
+        $css = plugins_url( 'css/related-content-frontend.css', __FILE__ );
+        wp_enqueue_style('navis-related-content-frontend', $css, array(), '0.1');
+    }
+    
+    function add_admin_stylesheet() {
         $css = plugins_url( 'css/related-content.css', __FILE__ );
         wp_enqueue_style('wp-jquery-ui-dialog');
         wp_enqueue_style(

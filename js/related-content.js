@@ -11,7 +11,6 @@
     };
 
     Backbone.sync = function(method, model, options) {
-        
         var actions = {
             'create': 'save_related_content',
             'update': 'save_related_content',
@@ -22,7 +21,9 @@
         if (!data.action) {
             data.action = actions[method];
         }
-        console.log(data);
+        
+        _.extend(data, model.toJSON());
+        
         if (!data.action) return;
         
         $.ajax({
