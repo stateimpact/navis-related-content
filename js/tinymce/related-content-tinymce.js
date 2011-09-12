@@ -56,7 +56,7 @@
             ed.addButton('related_content', {
                 title : 'Related Content',
                 cmd : 'related_content',
-                image : url + '/related_content.png'
+                image : url + '/related-content-button.png'
             });
 
             // Add a node change handler, selects the button in the UI when a image is selected
