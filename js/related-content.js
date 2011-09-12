@@ -225,6 +225,13 @@
                 topics: this.topics.collection.toJSON()
             });
             this.model.save();
+        },
+        
+        insertShortcode: function(align) {
+            if (!this.editor) return;
+            align = align || 'right';
+            this.editor.execCommand('mceInsertContent', false, 
+                '[related_content align="' + align + '"]');
         }
         
     });

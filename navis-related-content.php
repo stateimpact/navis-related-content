@@ -247,7 +247,7 @@ class Navis_Related_Content {
             'left' => 'alignleft',
             'right' => 'alignright'
         );
-        if (in_array($align, $classnames)) {
+        if (array_key_exists($align, $classnames)) {
             $classname = $classnames[$align];
         } else {
             $classname = "alignright";
