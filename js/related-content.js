@@ -244,6 +244,7 @@
         
         insertShortcode: function(align) {
             if (!this.editor) return;
+            this.save();
             align = align || 'right';
             this.editor.execCommand('mceInsertContent', false, 
                 '[related_content align="' + align + '"]');
