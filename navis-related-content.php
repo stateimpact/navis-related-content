@@ -252,18 +252,19 @@ class Navis_Related_Content {
         } else {
             $classname = "alignright";
         }
-        $html  = "<div id=\"related_content\" class=\"$classname\">";
-        $html .= '<div class="heading"><h4>Related</h4></div>';
+        $html  = "<div class=\"related-content $classname\">";
+        $html .= '<h4 class="related-header">Related</h4>';
         
         // links
         $html .= '<div class="links">';
-        $html .= '<ul class="links">';
+        $html .= '<h5>Posts</h5>';
+        $html .= '<ul>';
         foreach($links as $link) {
             $html .= '<li class="link">';
             $html .= "<a href=\"{$link['permalink']}\">{$link['title']}</a>";
             $html .= '</li>';
         }
-        $html .= '</ul></div><hr>';
+        $html .= '</ul></div>';
         
         // topics
         $html .= '<div class="topics">';

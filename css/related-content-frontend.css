@@ -1,22 +1,22 @@
-#related_content {
+.related-content {
     width: 250px;
     background-color: #f6f6f6;
     border: 1px solid #ddd;
 }
 
-#related_content div {
+.related-content div {
     padding: 0 .5em 0 .5em;
 }
 
-#related_content p {
+.related-content p {
     font-size: 14px;
     line-height: 21px;
     clear: both;
 }
 
-#related_content div.heading {
+.related-content .related-header {
     background-color: #000;
     color: #fff;
     margin: 0;
-    padding-top: .25em;
+    padding: .25em;
 }
