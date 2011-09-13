@@ -47,7 +47,8 @@
             title: "",
             permalink: "",
             type: "post",
-            thumbnail: ""
+            thumbnail: "",
+            order: 0
         },
         
         url: window.ajaxurl
@@ -85,6 +86,10 @@
             // a helper for later
             this.name = options.name;
             return this;
+        },
+        
+        comparator: function(link) {
+            return link.get('order');
         }
     });
     
@@ -102,6 +107,7 @@
         },
         
         render: function() {
+            $(this.el).attr('id', this.model.id);
             if (this.model.get('thumbnail') && this.model.get('type') === "topic") {
                 var img = $('<img/>')
                     .attr('src', this.model.get('thumbnail'))
@@ -148,6 +154,23 @@
             _.bindAll(this);
             this.collection.bind('reset', this.render);
             this.collection.bind('add', this.addLink);
+            
+            var that = this;
+            if (options.sortable) {
+                var el = $(this.el);
+                el.sortable({
+                    cursor: 'pointer',
+                    update: function(event, ui) {
+                        el.children('div.link').each(function(i) {
+                            var id = $(this).attr('id');
+                            var link = that.collection.get(id);
+                            link.set({ order: i });
+                        });
+                        window.related_content_builder.save();
+                    }
+                });
+            }
+            
             return this;
         },
         
@@ -179,7 +202,7 @@
         initialize: function(options) {
             _.extend(this, options);
             _.bindAll(this);
-                        
+            
             this.search = new LinkListView({
                 el: '#related-search-results',
                 collection: new LinkList([], {name: 'search'})
@@ -188,12 +211,14 @@
             
             this.links = new LinkListView({
                 el: "#chosen-links",
-                collection: new LinkList([], {name: 'links'})
+                collection: new LinkList([], {name: 'links'}),
+                sortable: true
             });
             
             this.topics = new LinkListView({
                 el: "#chosen-topics",
-                collection: new LinkList([], {name: 'topics'})
+                collection: new LinkList([], {name: 'topics'}),
+                sortable: true
             });
             
             var that = this;
@@ -201,6 +226,11 @@
             this.model.bind('change', function(module) {
                 that.links.collection.reset(module.get('links'));
                 that.topics.collection.reset(module.get('topics'));
+            });
+            
+            // and just in case, save everything if the post is updated
+            $('form').submit(function() {
+                that.save();
             });
             
             return this;

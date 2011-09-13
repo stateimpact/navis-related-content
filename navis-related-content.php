@@ -188,10 +188,12 @@ class Navis_Related_Content {
         <div id="chosen">
             <div id="links-wrap">
                 <h4>Links</h4>
+                <p class="howto">Click links to remove. Drag to reorder.</p>
                 <div id="chosen-links"></div>
             </div>
             <div id="topics-wrap">
                 <h4>Topics</h4>
+                <p class="howto">Click links to remove. Drag to reorder.</p>
                 <div id="chosen-topics"></div>
             </div>
         </div>
