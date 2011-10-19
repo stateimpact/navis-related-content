@@ -96,7 +96,8 @@ class Navis_Related_Content {
         // wp-admin/includes/internal-linking.php
         $pts = get_post_types( array( 'public' => true ), 'objects' );
     	$pt_names = array_keys( $pts );
-
+        $pt_names = apply_filters('navis_related_content_post_types', $pt_names);
+        
     	$query = array(
     		'post_type' => $pt_names,
     		'suppress_filters' => true,
