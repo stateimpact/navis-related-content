@@ -49,7 +49,7 @@ class Navis_Related_Content {
         );
         add_action( 
             'admin_print_styles-post-new.php', 
-            array( &$this, 'add_admin_tylesheet' ) 
+            array( &$this, 'add_admin_stylesheet' ) 
         );
         
         add_action( 'admin_print_scripts-post.php', 
