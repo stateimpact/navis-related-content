@@ -242,7 +242,7 @@ class Navis_Related_Content {
     function shortcode($atts, $content = null) {
         global $post;
         $links = get_post_meta($post->ID, 'related_links', true);
-        $topics = get_post_meta($post->ID, 'related_topics', true);
+        $topics = (array)get_post_meta($post->ID, 'related_topics', true);
         extract(shortcode_atts(array(
             'align' => 'right'
         ), $atts));
