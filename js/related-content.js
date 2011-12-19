@@ -10,7 +10,7 @@
         };
     };
 
-    Backbone.sync = function(method, model, options) {
+    sync = function(method, model, options) {
         var actions = {
             'create': 'save_related_content',
             'update': 'save_related_content',
@@ -48,7 +48,8 @@
             permalink: "",
             type: "post",
             thumbnail: "",
-            order: 0
+            order: 0,
+            date: null
         },
         
         url: window.ajaxurl
@@ -62,6 +63,10 @@
             links: [],
             topics: []
         },
+        
+        sync: sync,
+        
+        url: window.ajaxurl,
         
         initialize: function(attributes, options) {
             this.set({ post_parent: $('#post_ID').val()});
@@ -78,6 +83,8 @@
     // collections are simple
     // we need two here: links/posts and topics
     window.LinkList = Backbone.Collection.extend({
+        sync: sync,
+        
         model: Link,
         
         url: window.ajaxurl,
@@ -90,8 +97,11 @@
         
         comparator: function(link) {
             return link.get('order');
-        }
+        }        
     });
+    
+    var LINK_TEMPLATE = '<a href="<%= permalink %>"><%= type.toUpperCase() %>: <%= title %></a>' +
+                        '<span class="info"><%= date %></span>';
     
     var LinkView = Backbone.View.extend({
         
@@ -101,19 +111,17 @@
             'click a' : 'chooseLink'
         },
         
+        template: _.template(LINK_TEMPLATE),
+        
         initialize: function(options) {
             _.bindAll(this);
             return this.render();
         },
         
         render: function() {
-            $(this.el).attr('id', this.model.id);
-            if (this.model.get('thumbnail') && this.model.get('type') === "topic") {
-                var img = $('<img/>')
-                    .attr('src', this.model.get('thumbnail'))
-                    .appendTo( $(this.el) );
-            };
-            
+            $(this.el).attr('id', this.model.id);            
+            $(this.el).html(this.template(this.model.toJSON()));
+            /***
             var a = $('<a/>')
                 .attr('href', this.model.get('permalink'))
                 .text(this.model.get('type').toUpperCase() + ": " + this.model.get('title'))
@@ -123,7 +131,7 @@
                 var del = $('<a class="button">X</a>')
                     .appendTo( $(this.el) );
             }
-            
+            ***/
             return this;
         },
         
@@ -220,6 +228,11 @@
                 collection: new LinkList([], {name: 'topics'}),
                 sortable: true
             });
+            
+            // order search results by date
+            this.search.collection.comparator = function(link) {
+                return -Date.parse(link.get('date'));
+            }
             
             var that = this;
             this.model = new RelatedContentModule;

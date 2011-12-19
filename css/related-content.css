@@ -21,6 +21,11 @@ div.link {
     clear: both;
 }
 
+div.link .info {
+    color: #a1a1a1;
+    margin-left: 1em;
+}
+
 div.link img {
     float: left;
     margin-right: .25em;

@@ -135,7 +135,8 @@ class Navis_Related_Content {
     			'id' => $post->ID,
     			'title' => trim( esc_html( strip_tags( get_the_title( $post ) ) ) ),
     			'permalink' => get_permalink( $post->ID ),
-    			'info' => $info,
+    			'date' => mysql2date( __( 'Y/m/d' ), $post->post_date ),
+    			'type' => $post->post_type
     		);
     		
     		if (has_post_thumbnail($post->ID)) {
@@ -145,9 +146,7 @@ class Navis_Related_Content {
     		        $data['thumbnail'] = $thumbnail[0];
     		    }
     		}
-    		
-    		$data['type'] = get_post_type($post->ID);
-    		
+    		    		
     		$results[] = $data;
     	}
 
@@ -259,28 +258,32 @@ class Navis_Related_Content {
         $html .= '<h4 class="related-header">Related</h4>';
         
         // links
+        if ($links):
         $html .= '<div class="links">';
         $html .= '<h5>Posts</h5>';
         $html .= '<ul>';
-        foreach($links as $link) {
+        foreach((array)$links as $link) {
             $html .= '<li class="link">';
             $html .= "<a href=\"{$link['permalink']}\">{$link['title']}</a>";
             $html .= '</li>';
         }
         $html .= '</ul></div>';
+        endif;
         
         // topics
-        $html .= '<div class="topics">';
-        $html .= '<h5>Topics</h5>';
-        foreach($topics as $topic) {
-            $html .= '<p class="topic">';
-            if ($topic['thumbnail']) {
-                $html .= "<img class=\"alignleft\" src=\"{$topic['thumbnail']}\" height=\"60\" width=\"60\" />";
+        if ($topics):
+            $html .= '<div class="topics">';
+            $html .= '<h5>Topics</h5>';
+            foreach((array)$topics as $topic) {
+                $html .= '<p class="topic">';
+                if ($topic['thumbnail']) {
+                    $html .= "<img class=\"alignleft\" src=\"{$topic['thumbnail']}\" height=\"60\" width=\"60\" />";
+                }
+                $html .= "<a href=\"{$topic['permalink']}\">{$topic['title']}</a>";
+                $html .= "</p>";
             }
-            $html .= "<a href=\"{$topic['permalink']}\">{$topic['title']}</a>";
-            $html .= "</p>";
-        }
-        $html .= '</div>'; // close .topics
+            $html .= '</div>'; // close .topics
+        endif;
         $html .= '</div>'; // and we're done
         return $html;
     }
