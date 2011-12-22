@@ -125,17 +125,6 @@
         render: function() {
             $(this.el).attr('id', this.model.id);            
             $(this.el).html(this.template(this.model.toJSON()));
-            /***
-            var a = $('<a/>')
-                .attr('href', this.model.get('permalink'))
-                .text(this.model.get('type').toUpperCase() + ": " + this.model.get('title'))
-                .appendTo( $(this.el) );
-            
-            if (this.collection && this.collection.name !== 'search') {
-                var del = $('<a class="button">X</a>')
-                    .appendTo( $(this.el) );
-            }
-            ***/
             return this;
         },
         
