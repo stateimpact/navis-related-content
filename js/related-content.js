@@ -100,7 +100,11 @@
         }        
     });
     
-    var LINK_TEMPLATE = '<a href="<%= permalink %>"><%= type.toUpperCase() %>: <%= title %></a>' +
+    var LINK_TEMPLATE = '<a href="<%= permalink %>">' +
+                        '<% if (thumbnail) { %>' +
+                        '<img src="<%= thumbnail %>" height="40" width="40">' +
+                        '<% } %>' + 
+                        '<%= type.toUpperCase() %>: <%= title %></a>' +
                         '<span class="info"><%= date %></span>';
     
     var LinkView = Backbone.View.extend({
