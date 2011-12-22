@@ -3,7 +3,8 @@
     padding: .5em;
 }
 
-#related-search-results {
+#related-search-results,
+#related-search-topic-results {
     height: 200px;
     overflow: auto;
 }
@@ -42,4 +43,14 @@ div.link img {
     width: 100%;
     margin-right: .25em;
     margin-left: .25em;
+}
+
+#tabs ul li {
+    float: left;
+    display: inline;
+    margin: .5em;
+}
+
+#tabs ul li.ui-state-active {
+    font-weight: bold;
 }

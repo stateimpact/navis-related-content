@@ -208,18 +208,25 @@
         
         events: {
             'click input.add' : 'addLink',
-            'keyup #related-search-field' : 'searchContent'
+            'keyup #related-search-field' : 'search'
         },
         
         initialize: function(options) {
             _.extend(this, options);
             _.bindAll(this);
+            $('#tabs').tabs();
             
             this.search = new LinkListView({
                 el: '#related-search-results',
                 collection: new LinkList([], {name: 'search'})
             });
             this.search.collection.fetch();
+            
+            this.topic_search = new LinkListView({
+                el: '#related-search-topic-results',
+                collection: new LinkList([], {name: 'search'})
+            });
+            this.topic_search.collection.fetch({ data: { post_type: 'topic' }});
             
             this.links = new LinkListView({
                 el: "#chosen-links",
@@ -253,7 +260,12 @@
             return this;
         },
         
-        searchContent: function(e) {
+        search: function(e) {
+            this.searchPosts();
+            this.searchTopics();
+        },
+        
+        searchPosts: function() {
             var query = this.$('#related-search-field').val();
             if (query.length > 3) {
                 this.search.collection.fetch({ 
@@ -263,6 +275,21 @@
                 });
             } else if (query.length == 0) {
                 this.search.collection.fetch();
+            }
+            return this;
+        },
+        
+        searchTopics: function() {
+            var query = this.$('#related-search-field').val();
+            if (query.length > 3) {
+                this.topic_search.collection.fetch({ 
+                    data: {
+                        s: query,
+                        post_type: 'topic'
+                    }
+                });
+            } else if (query.length == 0) {
+                this.topic_search.collection.fetch();
             }
             return this;
         },

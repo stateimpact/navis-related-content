@@ -108,6 +108,8 @@ class Navis_Related_Content {
     		'orderby' => 'post_date',
     		'posts_per_page' => 50,
     	);
+    	
+	    $query = wp_parse_args($args, $query);
 
     	$args['pagenum'] = isset( $args['pagenum'] ) ? absint( $args['pagenum'] ) : 1;
 
@@ -178,10 +180,21 @@ class Navis_Related_Content {
         				<input type="text" id="related-search-field" class="link-search-field" tabindex="60" autocomplete="off" />
         			</label>
         		</div>
-        		<div id="related-search-results" class="query-results">
-        			<div class="river-waiting">
-        				<img class="waiting" src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" alt="" />
-        			</div>
+        		<div id="tabs">
+            		<ul>
+            		    <li><a href="#related-search-results">All Content</a></li>
+            		    <li><a href="#related-search-topic-results">Topics</a></li>
+            		</ul>
+            		<div id="related-search-results" class="query-results">
+            			<div id="post-search" class="river-waiting">
+            				<img class="waiting" src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" alt="" />
+            			</div>
+            		</div>
+            		<div id="related-search-topic-results" class="query-results">
+            			<div id="post-search" class="river-waiting">
+            				<img class="waiting" src="<?php echo esc_url( admin_url( 'images/wpspin_light.gif' ) ); ?>" alt="" />
+            			</div>
+            		</div>
         		</div>
         	</div>
         </div>
@@ -311,6 +324,7 @@ class Navis_Related_Content {
         wp_enqueue_script( 'underscore', $jslibs['underscore']);
         wp_enqueue_script( 'backbone', $jslibs['backbone'],
             array('underscore', 'jquery'));
+        wp_enqueue_script('jquery-ui-tabs');
         wp_enqueue_script( 'related-content', $jslibs['related-content'],
             array('jquery', 'underscore', 'backbone'),
             "0.1");
