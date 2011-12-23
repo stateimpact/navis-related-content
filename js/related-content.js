@@ -101,7 +101,7 @@
     });
     
     var LINK_TEMPLATE = '<a href="<%= permalink %>">' +
-                        '<% if (thumbnail) { %>' +
+                        '<% if (thumbnail && type === "topic") { %>' +
                         '<img src="<%= thumbnail %>" height="40" width="40">' +
                         '<% } %>' + 
                         '<%= type.toUpperCase() %>: <%= title %></a>' +
