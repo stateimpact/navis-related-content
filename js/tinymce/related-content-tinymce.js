@@ -24,15 +24,20 @@
                                 dialogClass: 'wp-dialog',
                                 width: 550,
                                 buttons: {
-                                    "Save": function() {
+                                    "Cancel" : function() {
+                                        window.related_content_dialog.dialog('close');
+                                    },
+                                    
+                                    "Save" : function() {
                                         window.related_content_builder.save();
                                     },
                                     
-                                    "Insert Left": function() {
+                                    "Insert Left" : function() {
                                         window.related_content_builder.insertShortcode('left');
                                         window.related_content_dialog.dialog('close');
                                     },
-                                    "Insert Right": function() {
+                                    
+                                    "Insert Right" : function() {
                                         window.related_content_builder.insertShortcode('right');
                                         window.related_content_dialog.dialog('close');
                                     }
