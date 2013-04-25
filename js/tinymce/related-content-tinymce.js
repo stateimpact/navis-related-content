@@ -64,7 +64,7 @@
                 image : url + '/related-content-button.png'
             });
 
-            // Add a node change handler, selects the button in the UI when a image is selected
+            // Add a node change handler, selects the button in the UI when an image is selected
             ed.onNodeChange.add(function(ed, cm, n) {
                 cm.setActive('related_content', n.nodeName == 'IMG');
             });

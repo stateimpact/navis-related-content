@@ -316,17 +316,17 @@ class Navis_Related_Content {
     
     function register_admin_scripts() {
         $jslibs = array(
-            'underscore' => plugins_url('js/underscore-min.js', __FILE__),
-            'backbone' => plugins_url('js/backbone-min.js', __FILE__),
+            'underscore-old' => plugins_url('js/underscore-min.js', __FILE__),
+            'backbone-old' => plugins_url('js/backbone-min.js', __FILE__),
             'related-content' => plugins_url('js/related-content.js', __FILE__),
         );
         
-        wp_enqueue_script( 'underscore', $jslibs['underscore']);
-        wp_enqueue_script( 'backbone', $jslibs['backbone'],
-            array('underscore', 'jquery'));
+        wp_enqueue_script( 'underscore-old', $jslibs['underscore-old']);
+        wp_enqueue_script( 'backbone-old', $jslibs['backbone-old'],
+            array('underscore-old', 'jquery'));
         wp_enqueue_script('jquery-ui-tabs');
         wp_enqueue_script( 'related-content', $jslibs['related-content'],
-            array('jquery', 'underscore', 'backbone'),
+            array('jquery', 'underscore-old', 'backbone-old'),
             "0.1");
         
     }
