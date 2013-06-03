@@ -23,9 +23,9 @@
         }
         
         _.extend(data, model.toJSON());
-        
+
         if (!data.action) return;
-        
+
         $.ajax({
             url: window.ajaxurl,
             type: 'POST',
@@ -34,15 +34,15 @@
             error: options.error
         });
     }
-    
+
     // one link, to a post, topic, or somewhere else
     var Link = Backbone.Model.extend({
-        
+
         initialize: function(attributes, options) {
             this.view = new LinkView({ model: this });
             return this;
         },
-        
+
         defaults: {
             title: "",
             permalink: "",
@@ -51,23 +51,23 @@
             order: 0,
             date: null
         },
-        
+
         url: window.ajaxurl
     });
-    
+
     // container model for a group of links
     var RelatedContentModule = Backbone.Model.extend({
-        
+
         defaults: {
             title: "",
             links: [],
             topics: []
         },
-        
+
         sync: sync,
-        
+
         url: window.ajaxurl,
-        
+
         initialize: function(attributes, options) {
             this.set({ post_parent: $('#post_ID').val()});
             this.fetch({
@@ -79,62 +79,62 @@
             return this;
         }
     });
-    
+
     // collections are simple
     // we need two here: links/posts and topics
     window.LinkList = Backbone.Collection.extend({
         sync: sync,
-        
+
         model: Link,
-        
+
         url: window.ajaxurl,
-        
+
         initialize: function(models, options) {
             // a helper for later
             this.name = options.name;
             return this;
         },
-        
+
         comparator: function(link) {
             return link.get('order');
-        }        
+        }
     });
-    
+
     var LINK_TEMPLATE = '<a href="<%= permalink %>">' +
                         '<% if (thumbnail && type === "topic") { %>' +
                         '<img src="<%= thumbnail %>" height="40" width="40">' +
-                        '<% } %>' + 
+                        '<% } %>' +
                         '<%= type.toUpperCase() %>: <%= title %></a>' +
                         '<span class="info"><%= date %></span>';
-    
+
     var LinkView = Backbone.View.extend({
-        
+
         className: 'link',
-        
+
         events: {
             'click a' : 'chooseLink'
         },
-        
+
         template: _.template(LINK_TEMPLATE),
-        
+
         initialize: function(options) {
             _.bindAll(this);
             return this.render();
         },
-        
+
         render: function() {
-            $(this.el).attr('id', this.model.id);            
+            $(this.el).attr('id', this.model.id);
             $(this.el).html(this.template(this.model.toJSON()));
             return this;
         },
-        
+
         chooseLink: function(e) {
             e.preventDefault();
             var link = this.model;
             if (link.collection.name === "search") {
                 // it's in the search box, not chosen yet
                 link.collection.remove(link);
-                
+
                 if (link.get('type') === "topic") {
                     window.related_content_builder.topics.collection.add(link);
                 } else {
@@ -147,15 +147,15 @@
             }
         }
     });
-    
+
     // view for a collection of links of any type
     var LinkListView = Backbone.View.extend({
-        
+
         initialize: function(options) {
             _.bindAll(this);
             this.collection.bind('reset', this.render);
             this.collection.bind('add', this.addLink);
-            
+
             var that = this;
             if (options.sortable) {
                 var el = $(this.el);
@@ -171,10 +171,10 @@
                     }
                 });
             }
-            
+
             return this;
         },
-        
+
         render: function() {
             var el = this.el;
             $(el).empty();
@@ -182,24 +182,24 @@
                 $(el).append(link.view.el);
             });
         },
-        
+
         addLink: function(link) {
             $(this.el).append(link.view.el);
         }
     });
-    
-    
+
+
     // build a related content module
     // tinymce should call this
     window.RelatedContentBuilder = Backbone.View.extend({
-        
+
         el: '#navis-related-content-form',
-        
+
         events: {
             'click input.add' : 'addLink',
             'keyup #related-search-field' : 'search'
         },
-        
+
         initialize: function(options) {
             _.extend(this, options);
             _.bindAll(this);
