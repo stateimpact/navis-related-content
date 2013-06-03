@@ -52,10 +52,10 @@ class Navis_Related_Content {
             array( &$this, 'add_admin_stylesheet' ) 
         );
         
-        add_action( 'admin_print_scripts-post.php', 
+        add_action( 'admin_print_scripts-post.php',
             array( &$this, 'register_admin_scripts' )
         );
-        add_action( 'admin_print_scripts-post-new.php', 
+        add_action( 'admin_print_scripts-post-new.php',
             array( &$this, 'register_admin_scripts' )
         );
         
@@ -320,13 +320,15 @@ class Navis_Related_Content {
             'backbone-old' => plugins_url('js/backbone-min.js', __FILE__),
             'related-content' => plugins_url('js/related-content.js', __FILE__),
         );
-        
-        wp_enqueue_script( 'underscore-old', $jslibs['underscore-old']);
-        wp_enqueue_script( 'backbone-old', $jslibs['backbone-old'],
-            array('underscore-old', 'jquery'));
+        wp_deregister_script('underscore');
+        wp_register_script( 'underscore', plugins_url('js/underscore-min.js',__FILE__), false, '1.4.4', false );
+        wp_deregister_script('backbone');
+        wp_register_script( 'backbone', plugins_url('js/backbone-min.js',__FILE__), false, '0.9.3', false );
+        wp_enqueue_script( 'underscore');
+        wp_enqueue_script( 'backbone', array('underscore', 'jquery'));
         wp_enqueue_script('jquery-ui-tabs');
         wp_enqueue_script( 'related-content', $jslibs['related-content'],
-            array('jquery', 'underscore-old', 'backbone-old'),
+            array('jquery','jquery-ui-tabs', 'underscore', 'backbone'),
             "0.1");
         
     }
