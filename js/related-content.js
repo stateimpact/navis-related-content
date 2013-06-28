@@ -70,6 +70,10 @@
         
         initialize: function(attributes, options) {
             this.set({ post_parent: $('#post_ID').val()});
+            return this.refresh();
+        },
+
+        refresh: function() {
             this.fetch({
                 data: {
                     action: 'get_create_related_module',
@@ -195,6 +199,10 @@
         
         el: '#navis-related-content-form',
         
+        /**
+        _.bind throws an error when view.delegateEvents is called
+        with this hash. I'm not sure why.
+        **/
         _events: {
             'click input.add' : 'addLink',
             'keyup #related-search-field' : 'search'
@@ -203,9 +211,11 @@
         initialize: function(options) {
             _.extend(this, options);
             //_.bindAll(this);
+            
             _.bindAll(this, 'addLink', 'search', 'searchPosts', 'searchTopics');
             $('#tabs').tabs();
 
+            // binding by hand here
             this.$el.on('click', 'input.add', this.addLink);
             this.$el.on('keyup', '#related-search-field', this.search);
             
@@ -259,7 +269,7 @@
         },
         
         searchPosts: function() {
-            var query = this.$('#related-search-field').val();
+            var query = $('#related-search-field').val();
             if (query.length > 3) {
                 this.search.collection.fetch({ 
                     data: {
@@ -273,7 +283,7 @@
         },
         
         searchTopics: function() {
-            var query = this.$('#related-search-field').val();
+            var query = $('#related-search-field').val();
             if (query.length > 3) {
                 this.topic_search.collection.fetch({ 
                     data: {
@@ -288,8 +298,8 @@
         },
                 
         addLink: function(e) {
-            var title = this.$('#link-title-field'),
-                url = this.$('#url-field');
+            var title = $('#link-title-field'),
+                url = $('#url-field');
                 
             var link = new Link({
                 title: title.val(),

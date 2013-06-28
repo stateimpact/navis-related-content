@@ -34,12 +34,16 @@ class Navis_Related_Content {
         add_action('init', array(&$this, 'create_post_type'));
         add_action('init', array(&$this, 'register_tinymce_filters'));
         
+        // ajax actions
         add_action('wp_ajax_related_content_form',
             array(&$this, 'ajax_render_form'));
+        
         add_action('wp_ajax_get_create_related_module',
             array(&$this, 'ajax_get_create_module'));
+        
         add_action('wp_ajax_fetch_related_content',
             array(&$this, 'ajax_fetch'));
+        
         add_action('wp_ajax_save_related_content',
             array(&$this, 'ajax_save'));
         
@@ -228,6 +232,8 @@ class Navis_Related_Content {
 
             update_post_meta($post_id, 'related_links', $_POST['links']);
             update_post_meta($post_id, 'related_topics', $_POST['topics']);
+            //error_log(implode(', ', $_POST['links']));
+            //error_log($_POST['topics']);
         } else {
             error_log("No post_parent");
         }
