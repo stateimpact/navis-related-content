@@ -118,7 +118,7 @@
         template: _.template(LINK_TEMPLATE),
         
         initialize: function(options) {
-            _.bindAll(this);
+            //_.bindAll(this);
             return this.render();
         },
         
@@ -149,12 +149,12 @@
     });
     
     // view for a collection of links of any type
-    var LinkListView = Backbone.View.extend({
+    window.LinkListView = Backbone.View.extend({
         
         initialize: function(options) {
-            _.bindAll(this);
-            this.collection.bind('reset', this.render);
-            this.collection.bind('add', this.addLink);
+            //_.bindAll(this);
+            this.collection.on('reset', this.render, this);
+            this.collection.on('add', this.addLink, this);
             
             var that = this;
             if (options.sortable) {
@@ -195,15 +195,19 @@
         
         el: '#navis-related-content-form',
         
-        events: {
+        _events: {
             'click input.add' : 'addLink',
             'keyup #related-search-field' : 'search'
         },
         
         initialize: function(options) {
             _.extend(this, options);
-            _.bindAll(this);
+            //_.bindAll(this);
+            _.bindAll(this, 'addLink', 'search', 'searchPosts', 'searchTopics');
             $('#tabs').tabs();
+
+            this.$el.on('click', 'input.add', this.addLink);
+            this.$el.on('keyup', '#related-search-field', this.search);
             
             this.search = new LinkListView({
                 el: '#related-search-results',
@@ -236,7 +240,7 @@
             
             var that = this;
             this.model = new RelatedContentModule;
-            this.model.bind('change', function(module) {
+            this.model.on('change', function(module) {
                 that.links.collection.reset(module.get('links'));
                 that.topics.collection.reset(module.get('topics'));
             });

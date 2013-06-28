@@ -10,6 +10,7 @@
          */
         init : function(ed, url) {
             // Register the command so that it can be invoked by using tinyMCE.activeEditor.execCommand('mceExample');
+            window.ed = ed;
             ed.addCommand('related_content', function() {
                 function getRelatedForm() {
                     var data = {
