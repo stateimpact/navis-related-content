@@ -104,7 +104,7 @@
         }        
     });
     
-    var LINK_TEMPLATE = '<a href="<%= permalink %>">' +
+    var LINK_TEMPLATE = '<a target="_blank" href="<%= permalink %>">' +
                         '<% if (thumbnail && type === "topic") { %>' +
                         '<img src="<%= thumbnail %>" height="40" width="40">' +
                         '<% } %>' + 
@@ -115,26 +115,34 @@
         
         className: 'link',
         
-        events: {
+        _events: {
             'click a' : 'chooseLink'
         },
         
         template: _.template(LINK_TEMPLATE),
         
         initialize: function(options) {
-            //_.bindAll(this);
-            return this.render();
-        },
-        
-        render: function() {
-            $(this.el).attr('id', this.model.id);            
-            $(this.el).html(this.template(this.model.toJSON()));
+            _.bindAll(this);
+            this.render();
+            this.$el.on('click', 'a', this.chooseLink);
             return this;
         },
         
-        chooseLink: function(e) {
+        render: function() {
+            //console.log('Rendering: %s', this.model.get('title'));
+
+            this.$el.attr('id', this.model.id);            
+            this.$el.html(this.template(this.model.toJSON()));
+            //this.delegateEvents();
+            return this;
+        },
+        
+        _chooseLink: function(e) {
+            console.log('%s: %s', this.model.collection.name, this.model.get('title'));
             e.preventDefault();
+
             var link = this.model;
+
             if (link.collection.name === "search") {
                 // it's in the search box, not chosen yet
                 link.collection.remove(link);
@@ -149,6 +157,21 @@
                 link.collection.remove(link);
                 window.related_content_builder.search.collection.add(link);
             }
+            // re-render once we're done
+            this.render();
+        },
+
+        chooseLink: function(e) {
+            e.preventDefault();
+            var current = this.model.collection.name
+              , type = this.model.get('type');
+
+            this.model.collection.trigger('chooselink', this.model, {
+                from: current,
+                to: type
+            });
+
+            this.model.collection.remove(this.model);
         }
     });
     
@@ -156,22 +179,23 @@
     window.LinkListView = Backbone.View.extend({
         
         initialize: function(options) {
-            //_.bindAll(this);
+            _.bindAll(this);
             this.collection.on('reset', this.render, this);
             this.collection.on('add', this.addLink, this);
-            
+            this.collection.on('remove', this.removeLink, this);
+
             var that = this;
             if (options.sortable) {
-                var el = $(this.el);
-                el.sortable({
+                var $el = $(this.el);
+                $el.sortable({
                     cursor: 'pointer',
                     update: function(event, ui) {
-                        el.children('div.link').each(function(i) {
+                        $el.children('div.link').each(function(i) {
                             var id = $(this).attr('id');
                             var link = that.collection.get(id);
                             link.set({ order: i });
                         });
-                        window.related_content_builder.save();
+                        // window.related_content_builder.save();
                     }
                 });
             }
@@ -180,6 +204,8 @@
         },
         
         render: function() {
+            //console.log('Rendering: %s', this.collection.name);
+
             var el = this.el;
             $(el).empty();
             this.collection.each(function(link, i, links) {
@@ -187,8 +213,13 @@
             });
         },
         
-        addLink: function(link) {
+        addLink: function(link, options) {
             $(this.el).append(link.view.el);
+        },
+
+        removeLink: function(link, options) {
+            //console.log(window.link = link);
+            link.view.remove();
         }
     });
     
@@ -210,7 +241,6 @@
         
         initialize: function(options) {
             _.extend(this, options);
-            //_.bindAll(this);
             
             _.bindAll(this, 'addLink', 'search', 'searchPosts', 'searchTopics');
             $('#tabs').tabs();
@@ -242,7 +272,7 @@
                 collection: new LinkList([], {name: 'topics'}),
                 sortable: true
             });
-            
+
             // order search results by date
             this.search.collection.comparator = function(link) {
                 return -Date.parse(link.get('date'));
@@ -254,6 +284,10 @@
                 that.links.collection.reset(module.get('links'));
                 that.topics.collection.reset(module.get('topics'));
             });
+
+            _.each(['search', 'topic_search', 'links', 'topics'], function(collection) {
+                that[collection].on('chooselink', that.chooselink, that); 
+            });
             
             // and just in case, save everything if the post is updated
             $('form').submit(function() {
@@ -261,6 +295,15 @@
             });
             
             return this;
+        },
+
+        chooselink: function(link, options) {
+            var from = this[options.from]
+              , to = this[options.to];
+
+            console.log('Moving link: %s', link.get('title'));
+            console.log('From: %s', from.name);
+            console.log('To: %s', to.name);
         },
         
         search: function(e) {
@@ -306,7 +349,7 @@
                 permalink: url.val(),
                 type: "link"
             });
-            window.related_content_builder.links.collection.add(link);
+            this.links.collection.add(link);
             title.val('');
             url.val('');
         },
