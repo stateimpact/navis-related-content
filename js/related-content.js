@@ -137,30 +137,6 @@
             return this;
         },
         
-        _chooseLink: function(e) {
-            console.log('%s: %s', this.model.collection.name, this.model.get('title'));
-            e.preventDefault();
-
-            var link = this.model;
-
-            if (link.collection.name === "search") {
-                // it's in the search box, not chosen yet
-                link.collection.remove(link);
-                
-                if (link.get('type') === "topic") {
-                    window.related_content_builder.topics.collection.add(link);
-                } else {
-                    window.related_content_builder.links.collection.add(link);
-                }
-            } else {
-                // it's already been chosen, so we're un-choosing
-                link.collection.remove(link);
-                window.related_content_builder.search.collection.add(link);
-            }
-            // re-render once we're done
-            this.render();
-        },
-
         chooseLink: function(e) {
             e.preventDefault();
             var current = this.model.collection.name
@@ -205,7 +181,7 @@
         },
         
         render: function() {
-            console.log('Rendering: %s', this.collection.name);
+            //console.log('Rendering: %s', this.collection.name);
 
             var $el = this.$el;
             $el.empty();
@@ -218,7 +194,7 @@
             window.link = link;
             //this.$el.append(link.view.el);
             link.view.$el.appendTo(this.$el);
-            console.log('Adding [%s] to [%s]', link.get('title'), this.collection.name);
+            //console.log('Adding [%s] to [%s]', link.get('title'), this.collection.name);
             this.trigger('sorted');
         },
 
@@ -314,9 +290,9 @@
                 dest = this.search.collection;
             }
 
-            console.log('Moving %s: %s', link.get('type'), link.get('title'));
-            console.log('From: %s', options.from);
-            console.log('To: %s', dest.name);
+            //console.log('Moving %s: %s', link.get('type'), link.get('title'));
+            //console.log('From: %s', options.from);
+            //console.log('To: %s', dest.name);
 
             dest.add(link);
         },
