@@ -115,7 +115,7 @@
         
         className: 'link',
         
-        _events: {
+        events: {
             'click a' : 'chooseLink'
         },
         
@@ -124,7 +124,7 @@
         initialize: function(options) {
             _.bindAll(this);
             this.render();
-            this.$el.on('click', 'a', this.chooseLink);
+            //this.$el.on('click', 'a', this.chooseLink);
             return this;
         },
         
@@ -168,7 +168,7 @@
 
             this.model.collection.trigger('chooselink', this.model, {
                 from: current,
-                to: type
+                type: type
             });
 
             this.model.collection.remove(this.model);
@@ -179,7 +179,7 @@
     window.LinkListView = Backbone.View.extend({
         
         initialize: function(options) {
-            _.bindAll(this);
+            //_.bindAll(this);
             this.collection.on('reset', this.render, this);
             this.collection.on('add', this.addLink, this);
             this.collection.on('remove', this.removeLink, this);
@@ -195,7 +195,8 @@
                             var link = that.collection.get(id);
                             link.set({ order: i });
                         });
-                        // window.related_content_builder.save();
+                        //window.related_content_builder.save();
+                        that.trigger('sorted');
                     }
                 });
             }
@@ -204,17 +205,21 @@
         },
         
         render: function() {
-            //console.log('Rendering: %s', this.collection.name);
+            console.log('Rendering: %s', this.collection.name);
 
-            var el = this.el;
-            $(el).empty();
+            var $el = this.$el;
+            $el.empty();
             this.collection.each(function(link, i, links) {
-                $(el).append(link.view.el);
+                $el.append(link.view.el);
             });
         },
         
         addLink: function(link, options) {
-            $(this.el).append(link.view.el);
+            window.link = link;
+            //this.$el.append(link.view.el);
+            link.view.$el.appendTo(this.$el);
+            console.log('Adding [%s] to [%s]', link.get('title'), this.collection.name);
+            this.trigger('sorted');
         },
 
         removeLink: function(link, options) {
@@ -285,8 +290,10 @@
                 that.topics.collection.reset(module.get('topics'));
             });
 
-            _.each(['search', 'topic_search', 'links', 'topics'], function(collection) {
-                that[collection].on('chooselink', that.chooselink, that); 
+            _.each(['search', 'topic_search', 'links', 'topics'], function(view) {
+                var view = that[view];
+                view.collection.on('chooselink', that.chooselink, that);
+                view.on('sorted', that.update, that);
             });
             
             // and just in case, save everything if the post is updated
@@ -298,12 +305,20 @@
         },
 
         chooselink: function(link, options) {
-            var from = this[options.from]
-              , to = this[options.to];
+            var type = link.get('type'), dest;
+            if (options.from === 'search') {
+                // adding this link to the module, send it to its proper place
+                dest = type === 'topic' ? this.topics.collection : this.links.collection;
+            } else {
+                // send it back to search
+                dest = this.search.collection;
+            }
 
-            console.log('Moving link: %s', link.get('title'));
-            console.log('From: %s', from.name);
-            console.log('To: %s', to.name);
+            console.log('Moving %s: %s', link.get('type'), link.get('title'));
+            console.log('From: %s', options.from);
+            console.log('To: %s', dest.name);
+
+            dest.add(link);
         },
         
         search: function(e) {
@@ -355,11 +370,15 @@
         },
         
         save: function() {
+            this.update();
+            this.model.save();
+        },
+
+        update: function() {
             this.model.set({
                 links: this.links.collection.toJSON(),
                 topics: this.topics.collection.toJSON()
             });
-            this.model.save();
         },
         
         insertShortcode: function(align) {
